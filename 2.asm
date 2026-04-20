@@ -7,46 +7,46 @@ c db 4
 d db 3 
 res dw ? 
 x db ?
-y dw ?              ; Changed from db to dw (word)
+y dw ?           
 
 start:
-    mov cx, 8
+    mov cx, 8; цикл 8
     mov bl, -3
 
 metka:
-    mov x, bl
+    mov x, bl;x=BL
     
-    push cx
-    push bx
+    push cx; cчетчик в стек
+    push bx; 
     
-    cmp bl, 0
-    jl  CalcY1
-    je  CalcY2
-    jg  CalcY3
+    cmp bl, 0;сравнение bl с 0 
+    jl  CalcY1; bl<0
+    je  CalcY2; bl=0a
+    jg  CalcY3; bl>0
 
 CalcY1:
-    ; y1 = (aІ + x) / c
-    mov al, a
-    mul al              ; AX = aІ
-    mov bx, ax
+    ; y1 = (a^2 + x) / c
+    mov al, a;a->al
+    mul al; ax=al^2           
+    mov bx, ax;bx=ax
     
     mov al, x
-    cbw
-    add ax, bx
+    cbw; ax=al
+    add ax, bx; ax= a^2+x
     
     mov bl, c
-    div bl              ; AL = quotient
-    cbw                 ; AX = AL 
-    mov y, ax           ; Store word
+    div bl; al=(a^2+x)/c              
+    cbw; ax=al                 
+    mov y, ax           
     jmp PrintResult
 
 CalcY2:
     ; y2 = (a + b) / d
     mov al, a
-    add al, b
+    add al, b;al=a+b
     cbw
     mov bl, d
-    div bl
+    div bl; al=ax/d
     cbw
     mov y, ax
     jmp PrintResult
@@ -55,25 +55,25 @@ CalcY3:
     ; y3 = 3 * a * x
     mov al, a
     mov bl, x
-    mul bl              ; AX = a * x
+    mul bl; ax = a * x              
     mov bl, 3
-    mul bl              ; AX = 3 * a * x
-    mov y, ax           ; Store word (can hold up to 32767)
+    mul bl; ax = ax * 3
+    mov y, ax  
     jmp PrintResult
 
 PrintResult:
     ; Print "x="
-    mov ah, 02h
+    mov ah, 02h; Dos: вывод символа
     mov dl, 'x'
-    int 21h
+    int 21h; вывод x
     mov dl, '='
-    int 21h
+    int 21h; вывод =
     
     ; Print x
     mov al, x
-    cbw
+    cbw; ax = x
     call print_ax
-    
+    ; пробел между x и y
     mov ah, 02h
     mov dl, ' '
     int 21h
@@ -84,24 +84,24 @@ PrintResult:
     mov dl, '='
     int 21h
     
-    ; Print y directly from memory (word)
-    mov ax, y           ; Load word
+    ; Print y 
+    mov ax, y
     call print_ax
     
     ; New line
     mov ah, 02h
-    mov dl, 13
+    mov dl, 13; символ возврата коретки
     int 21h
-    mov dl, 10
+    mov dl, 10; new line символ
     int 21h
     
-    pop bx
+    pop bx; востановить x, cx-счётчик цикла
     pop cx
     
-    inc bl
+    inc bl; x=x+1
     loop metka
     
-    mov ax, 4c00h
+    mov ax, 4c00h; конец программы
     int 21h
 
 print_ax:
